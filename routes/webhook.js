@@ -6,12 +6,13 @@ var express = require('express');
 var router = express.Router();
 const crypto = require('crypto');
 const debug = require('debug');
+var request = require('request');
 
 var bparser = require('body-parser');
 
 const APP_ID = "639b18ea-dcaa-4da5-bc8a-f1cf2c26acd2";
 const APP_SECRET = "foq4haxi8ivi01fgmd91rbbcpmhqthoy";
-const WEBHOOK_SECRET = "q67u35d3f9h3cips9x8ud2ujmqetpjbr";
+const WEBHOOK_SECRET = "fgumxes83tnwj9yqx9a5a0dyodmbxbzz";
 
 
 var jsonParser = bparser.json();
@@ -39,7 +40,54 @@ router.post('/',  jsonParser, function(req, res, next) {
 
     if(req.body.annotationType == 'message-focus') {
         console.log('message focus');
+        console.log(req.body.spaceName);
+        console.log(req.body.annotationPayload);
+        console.log(JSON.parse(req.body.annotationPayload).payload);
+
+        var reply = JSON.parse(req.body.annotationPayload).payload
+        console.log(JSON.parse(reply).text);
+        var text = JSON.parse(reply).text;
+
+        request.post(
+            'https://api.watsonwork.ibm.com/oauth/token',
+            {
+                auth: {
+                    user: APP_ID,
+                    pass: APP_SECRET
+                },
+                json: true,
+                form: {
+                    grant_type: 'client_credentials'
+                }
+            },
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log(body)
+                    console.log(body.access_token);
+                }
+            }
+        );
+
+        request.post(
+            'https://api.watsonwork.ibm.com//v1/spaces/'+ +'/messages',
+            {
+                auth: {
+                    user: APP_ID,
+                    pass: APP_SECRET
+                },
+                json: true
+            },
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log(body)
+                    console.log(body.access_token);
+                }
+            }
+        );
+
+
     }
+
 
     res.send();
 
@@ -50,5 +98,8 @@ router.get('/', function(req, res, next) {
     res.send('Get method on webhook');
 
 });
+
+
+
 
 module.exports = router;
