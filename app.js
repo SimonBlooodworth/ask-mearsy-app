@@ -4,12 +4,16 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var storage = require('node-persist');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
 var webhook = require('./routes/webhook');
 
 var app = express();
+
+// Initialise Storage
+storage.initSync();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));

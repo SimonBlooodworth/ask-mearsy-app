@@ -9,6 +9,9 @@ const debug = require('debug');
 var request = require('request');
 var rp = require('request-promise')
 
+var fs = require('fs');
+var storage = require('node-persist');
+
 var bparser = require('body-parser');
 
 const APP_ID = "639b18ea-dcaa-4da5-bc8a-f1cf2c26acd2";
@@ -20,7 +23,7 @@ var jsonParser = bparser.json();
 /* Listen on Webhook */
 router.post('/',  jsonParser, function(req, res, next) {
 
-    if(req.body.type === 'verification' && check==false) {
+    if(req.body.type === 'verification') {
 
         const challenge = JSON.stringify({
             response: req.body.challenge
@@ -29,6 +32,59 @@ router.post('/',  jsonParser, function(req, res, next) {
         res.set('X-OUTBOUND-TOKEN',
             crypto.createHmac('sha256', WEBHOOK_SECRET).update(challenge).digest('hex'));
         res.type('json').send(challenge);
+
+
+
+        request.post(
+            'https://api.watsonwork.ibm.com/oauth/token',
+            {
+                auth: {
+                    user: APP_ID,
+                    pass: APP_SECRET
+                },
+                json: true,
+                form: {
+                    grant_type: 'client_credentials'
+                }
+            },
+            function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                    console.log(response.body);
+                    console.log(response.body.access_token);
+                    storage.setItemSync('token',response.body.access_token);
+
+                    var formData = {
+
+                        file: fs.createReadStream(__dirname + '/mearsy.jpg'),
+
+                    };
+
+                    request.post(
+                        'https://api.watsonwork.ibm.com/photos/',
+                        {
+                            headers: {
+                                'Authorization': 'Bearer ' + storage.getItemSync('token'),
+
+                            },
+                            formData: formData,
+                            json: true
+                        },
+                        function (error, response, body) {
+
+                            if (!error && response.statusCode == 200) {
+                                console.log(response.body);
+
+                            } else {
+                                console.log(error);
+                            }
+                        }
+                    );
+
+                }
+            }
+        );
+
+
     }
 
     if(req.get('X-OUTBOUND-TOKEN') !== crypto.createHmac('sha256', WEBHOOK_SECRET).update(JSON.stringify(req.body)).digest('hex')) {
@@ -50,6 +106,7 @@ router.post('/',  jsonParser, function(req, res, next) {
                 if (!error && response.statusCode == 200) {
                     console.log(body);
                     console.log(body.access_token);
+                    storage.setItemSync('token',response.body.access_token);
                 }
 
 
@@ -69,65 +126,44 @@ router.post('/',  jsonParser, function(req, res, next) {
         var spaceId = req.body.spaceId;
 
 
+
         request.post(
-            'https://api.watsonwork.ibm.com/oauth/token',
+            'https://api.watsonwork.ibm.com/v1/spaces/'+spaceId+'/messages',
             {
-                auth: {
-                    user: APP_ID,
-                    pass: APP_SECRET
+                headers: {
+                    'Authorization': 'Bearer ' + storage.getItemSync('token'),
+                    'spaceid':spaceId
+
                 },
-                json: true,
-                form: {
-                    grant_type: 'client_credentials'
-                }
+                body:{
+                    "type": "appMessage",
+                    "version": "1",
+
+                    "annotations":  [
+                        {
+
+                            "type": "generic",
+                            "version": "1",
+
+                            "color": "#36a64f",
+                            "title": "",
+                            "text": text[0],
+
+                        }
+                    ]
+                },
+                json: true
             },
             function (error, response, body) {
+                console.log(response.statusCode);
                 if (!error && response.statusCode == 200) {
                     console.log(response.body);
-                    console.log(response.body.access_token);
 
-                    request.post(
-                        'https://api.watsonwork.ibm.com/v1/spaces/'+spaceId+'/messages',
-                        {
-                            headers: {
-                                'Authorization': 'Bearer ' + response.body.access_token,
-                                'spaceid':spaceId
-
-                            },
-                            body:{
-                                "type": "appMessage",
-                                "version": "1",
-
-                                "annotations":  [
-                                    {
-
-                                        "type": "generic",
-                                        "version": "1",
-
-                                        "color": "#36a64f",
-                                        "title": "Mearsey says:",
-                                        "text": text[0],
-
-                                    }
-                                ]
-                            },
-                            json: true
-                        },
-                        function (error, response, body) {
-                            console.log(response.statusCode);
-                            if (!error && response.statusCode == 200) {
-                                console.log(response.body);
-
-                            } else {
-                                console.log(error);
-                            }
-                        }
-                    );
-
+                } else {
+                    console.log(error);
                 }
             }
         );
-
 
 
     }
