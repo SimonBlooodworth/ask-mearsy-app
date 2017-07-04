@@ -1,0 +1,4 @@
+applications:
+        - name: AskMearsey
+        random-route: true
+        memory: 128M

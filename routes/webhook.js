@@ -23,7 +23,7 @@ var jsonParser = bparser.json();
 /* Listen on Webhook */
 router.post('/',  jsonParser, function(req, res, next) {
 
-    if(req.body.type === 'verification') {
+    if (req.body.type === 'verification') {
 
         const challenge = JSON.stringify({
             response: req.body.challenge
@@ -32,7 +32,6 @@ router.post('/',  jsonParser, function(req, res, next) {
         res.set('X-OUTBOUND-TOKEN',
             crypto.createHmac('sha256', WEBHOOK_SECRET).update(challenge).digest('hex'));
         res.type('json').send(challenge);
-
 
 
         request.post(
@@ -51,7 +50,7 @@ router.post('/',  jsonParser, function(req, res, next) {
                 if (!error && response.statusCode == 200) {
                     console.log(response.body);
                     console.log(response.body.access_token);
-                    storage.setItemSync('token',response.body.access_token);
+                    storage.setItemSync('token', response.body.access_token);
 
                     var formData = {
 
@@ -87,7 +86,7 @@ router.post('/',  jsonParser, function(req, res, next) {
 
     }
 
-    if(req.get('X-OUTBOUND-TOKEN') !== crypto.createHmac('sha256', WEBHOOK_SECRET).update(JSON.stringify(req.body)).digest('hex')) {
+    if (req.get('X-OUTBOUND-TOKEN') !== crypto.createHmac('sha256', WEBHOOK_SECRET).update(JSON.stringify(req.body)).digest('hex')) {
         console.log('Invalid request signature');
         const err = new Error('Invalid request signature');
         request.post(
@@ -106,12 +105,55 @@ router.post('/',  jsonParser, function(req, res, next) {
                 if (!error && response.statusCode == 200) {
                     console.log(body);
                     console.log(body.access_token);
-                    storage.setItemSync('token',response.body.access_token);
+                    storage.setItemSync('token', response.body.access_token);
                 }
 
 
             }
         );
+
+    }
+
+    if (req.body.annotationType == 'actionSelected') {
+
+        console.log(JSON.parse(req.body.annotationPayload).targetDialogId );
+        //var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {text: \"text\"}}], " +
+            "attachments: [{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"informationcardtitle\", text: \"text\", subtitle: \"subtitle\", date: \"1499158974426\", buttons: [{text: \"text\", payload: \"payload\", style: PRIMARY}] }}}" +
+            ",{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"informationcardtitle\", text: \"text\", subtitle: \"subtitle\", date: \"1499158974426\", buttons: [{text: \"text\", payload: \"payload\", style: PRIMARY}] }}}" +
+            "]}) {successful}}"
+
+
+        //if (JSON.parse(req.body.annotationPayload).actions.contains("All About Beards!")) {
+            var title = "Mearsey knows beards!";
+            var text = "So you want to know about beards. Well you have hit the jackpot.";
+        //} else {*/
+           // var title = "It's me, Mearsey !";
+           // var text = "I am here to help you to answers your questions and provide you with the information you need to do work at Mears.";
+
+        var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {title: \"" + title + "\" , text: \"" + text + "\"}}  ]  }) {successful}} "
+
+        console.log(createTargetedMessage);
+        request.post(
+            'https://api.watsonwork.ibm.com/graphql',
+            {
+                headers: {
+                    'Authorization': 'Bearer ' + storage.getItemSync('token'),
+                    'Content-Type': 'application/graphql',
+                    'x-graphql-view': 'PUBLIC, BETA'
+                },
+                body:createTargetedMessage
+            },
+            function (error, response, body) {
+                console.log(response.statusCode);
+                if (!error && response.statusCode == 200) {
+                    console.log(response.body);
+
+                } else {
+                    console.log(error);
+                }
+            }
+        );
+
 
     }
 
