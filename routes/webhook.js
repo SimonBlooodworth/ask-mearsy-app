@@ -121,23 +121,186 @@ router.post('/',  jsonParser, function(req, res, next) {
 
     }
 
+    if (req.body.type == 'message-created') {
+
+        var content = req.body.content;
+        if (content == "Give me the last job for 1 Elers Way, Thaxted, Dunmow, Essex, CM6 2FN") {
+
+            var title = "Here is the last job for 1 Elers Way, Thaxted, Dunmow, Essex, CM6 2FN";
+            var jobs = "*Job*:540223896\n";
+            jobs = jobs + "*Job No*:907198\n";
+
+            jobs = jobs + "*Issued*: 21 Nov 2015 / 12:06\n";
+            jobs = jobs + "*Description*: Please send out a temporary heater.\n";
+            jobs = jobs + "*Received*: Saturday 21 November 2015 @12:06 (by Miss L Sullivan 01371831634)\n";
+            jobs = jobs + "*Job Type*: Carpenter\n";
+            jobs = jobs + "*Priority*: 00 - OOH\n";
+            jobs = jobs + "Click [here](https://mcmviewtest.mearsgroup.co.uk/Supervisor/540000000#/job/540223896) to view the full job detail.";
+
+
+            var spaceId = req.body.spaceId;
+
+            request.post(
+                'https://api.watsonwork.ibm.com/v1/spaces/' + spaceId + '/messages',
+                {
+                    headers: {
+                        'Authorization': 'Bearer ' + storage.getItem('token'),
+                        'spaceid': spaceId
+
+                    },
+                    body: {
+                        "type": "appMessage",
+                        "version": "1",
+
+                        "annotations": [
+                            {
+
+                                "type": "generic",
+                                "version": "1",
+
+                                "color": "#36a64f",
+                                "title": title,
+                                "text": jobs,
+
+                            }
+                        ]
+                    },
+                    json: true
+                },
+                function (error, response, body) {
+                    console.log(response.statusCode);
+                    if (!error && response.statusCode == 200) {
+                        console.log(response.body);
+                        console.log("HERE");
+
+                    } else {
+                        console.log(error);
+                        console.log("Andrew");
+                    }
+                }
+            );
+
+        }
+
+
+        if (content == "Give me all the jobs in the last month for 1 Elers Way, Thaxted, Dunmow, Essex, CM6 2FN") {
+
+            var title = "Here are all the jobs for '1 Elers Way, Thaxted, Dunmow, Essex, CM6 2FN' from 6th June 2017 to 6th July 2017";
+            var jobs = "*Job*:540223896\n";
+            jobs = jobs + "*Job No*:907198\n";
+
+            jobs = jobs + "*Issued*: 21 Nov 2015 / 12:06\n";
+            jobs = jobs + "*Description*: Please send out a temporary heater.\n";
+            jobs = jobs + "*Received*: Saturday 21 November 2015 @12:06 (by Miss L Sullivan 01371831634)\n";
+            jobs = jobs + "*Job Type*: Carpenter\n";
+            jobs = jobs + "*Priority*: 00 - OOH\n";
+            jobs = jobs + "Click [here](https://mcmviewtest.mearsgroup.co.uk/Supervisor/540000000#/job/540223896) to view the full job detail.\n\n";
+            jobs = jobs + "------------------------------------\n";
+            jobs = jobs + "*Job*:540223886\n";
+            jobs = jobs + "*Job No*: No. 1 907192 , No. 2 13353 , No. 3 606526 \n";
+
+            jobs = jobs + "*Issued*: 20 Nov 2015 / 22:44 \n";
+            jobs = jobs + "*Due*: 21 Nov 2015 / 22:44 \n";
+            jobs = jobs + "*Completed*: 21 Nov 2015 / 05:06 \n";
+            jobs = jobs + "*Description*: Electricity problem nothing going to gas boiler. No heating or hot water Disabled tenant. Children under 5.\n";
+            jobs = jobs + "*Received*: Friday 20 November 2015 @22:44  (by Miss Layla Sullivan 01371831634)\n";
+            jobs = jobs + "*Job Type*: Electrician\n";
+            jobs = jobs + "*Priority*: 00 - OOH\n";
+            jobs = jobs + "Click [here](https://mcmviewtest.mearsgroup.co.uk/Supervisor/540000000#/job/540223886) to view the full job detail.\n\n";
+            jobs = jobs + "------------------------------------\n";
+            jobs = jobs + "*Job*:540262742\n";
+            jobs = jobs + "*Job No*: No. 1 R913 , No. 2 R913\n";
+
+            jobs = jobs + "*Issued*: 03 Jul 2017 / 10:08\n";
+            jobs = jobs + "*Description*: Testing\n";
+            jobs = jobs + "*Received*: Monday 3 July 2017 @10:08  (by Miss Sulli L Sullivan Tel:01371831634 Mob:07956163577)\n";
+            jobs = jobs + "*Job Type*: Response\n";
+            jobs = jobs + "*Priority*: 12 - 12 Calendar Days\n";
+            jobs = jobs + "*Appointment Date*: Monday 3 July 2017 / 11:00  \n";
+            jobs = jobs + "Click [here](https://mcmviewtest.mearsgroup.co.uk/Supervisor/540000000#/job/540223896) to view the full job detail.\n\n";
+            jobs = jobs + "------------------------------------\n";
+
+
+            var spaceId = req.body.spaceId;
+
+            request.post(
+                'https://api.watsonwork.ibm.com/v1/spaces/' + spaceId + '/messages',
+                {
+                    headers: {
+                        'Authorization': 'Bearer ' + storage.getItem('token'),
+                        'spaceid': spaceId
+
+                    },
+                    body: {
+                        "type": "appMessage",
+                        "version": "1",
+
+                        "annotations": [
+                            {
+
+                                "type": "generic",
+                                "version": "1",
+
+                                "color": "#36a64f",
+                                "title": title,
+                                "text": jobs,
+
+                            }
+                        ]
+                    },
+                    json: true
+                },
+                function (error, response, body) {
+                    console.log(response.statusCode);
+                    if (!error && response.statusCode == 200) {
+                        console.log(response.body);
+                        console.log("HERE");
+
+                    } else {
+                        console.log(error);
+                        console.log("Andrew");
+                    }
+                }
+            );
+        }
+    }
+
     if (req.body.annotationType == 'actionSelected') {
 
-        console.log(JSON.parse(req.body.annotationPayload).targetDialogId );
-        var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {text: \"text\"}}], " +
-            "attachments: [{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"Useful Tool\", text: \"text\", subtitle: \"subtitle\", date: \"1499158974426\", buttons: [{text: \"text\", payload: \"payload\", style: PRIMARY}] }}}" +
-            ",{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"informationcardtitle\", text: \"text\", subtitle: \"subtitle\", date: \"1499158974426\", buttons: [{text: \"text\", payload: \"payload\", style: PRIMARY}] }}}" +
-            "]}) {successful}}"
 
 
-        //if (JSON.parse(req.body.annotationPayload).actions.contains("All About Beards!")) {
-            var title = "Mearsey knows beards!";
-            var text = "So you want to know about beards. Well you have hit the jackpot.";
-        //} else {*/
-           // var title = "It's me, Mearsey !";
-           // var text = "I am here to help you to answers your questions and provide you with the information you need to do work at Mears.";
+        console.log(JSON.parse(req.body.annotationPayload).actionId);
 
-        //var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {title: \"" + title + "\" , text: \"" + text + "\"}}  ]  }) {successful}} "
+        var createTargetedMessage = ""
+        if (JSON.parse(req.body.annotationPayload).actionId=="Display Job") {
+
+            createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {text: \"text\"}}], ";
+            createTargetedMessage = createTargetedMessage +  "attachments: [";
+
+
+            var title1 = "Please send out a temporary heater";
+            var subtitle1 = "Completed";
+
+            var text1 = "https://mcmviewtest.mearsgroup.co.uk/Supervisor/540000000#/job/540223896 ";
+            text1 = text1 + "Job No 907198 was Issued on 21 Nov 2015 / 12:06. ";
+            text1 = text1 + "Request is to 'Please send out a temporary heater'. ";
+            text1 = text1 + "Job received on Saturday 21 November 2015 @12:06 by Miss L Sullivan. ";
+            text1 = text1 + "Job Type is Carpenter with a Priority of 00 - OOH.";
+
+            //text1 = text1 +  "https://mcmviewtest.mearsgroup.co.uk/Supervisor/540000000#/job/540223896) to view the full job detail.";
+
+            createTargetedMessage = createTargetedMessage +  "{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"" + title1 + "\", text: \""+text1+"\", subtitle: \"" + subtitle1 + "\", date: \"1499158974426\", buttons: [{text: \"View Job\", payload: \"payload\", style: PRIMARY}] }}}";
+
+
+            var card_title2 = ""
+
+            var card_text2 = ""
+            createTargetedMessage = createTargetedMessage +  ",{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"informationcardtitle\", text: \"text\", subtitle: \"subtitle\", date: \"1499158974426\", buttons: [{text: \"text\", payload: \"payload\", style: PRIMARY}] }}}";
+            createTargetedMessage = createTargetedMessage +  "]}) {successful}}";
+
+        } else {
+            createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {title: \"" + title + "\" , text: \"" + text + "\"}}  ]  }) {successful}} "
+        }
 
         console.log(createTargetedMessage);
         request.post(
