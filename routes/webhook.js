@@ -124,7 +124,7 @@ router.post('/',  jsonParser, function(req, res, next) {
     if (req.body.annotationType == 'actionSelected') {
 
         console.log(JSON.parse(req.body.annotationPayload).targetDialogId );
-        var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {text: \"text\"}}], " +
+        //var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {text: \"text\"}}], " +
             "attachments: [{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"informationcardtitle\", text: \"text\", subtitle: \"subtitle\", date: \"1499158974426\", buttons: [{text: \"text\", payload: \"payload\", style: PRIMARY}] }}}" +
             ",{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"informationcardtitle\", text: \"text\", subtitle: \"subtitle\", date: \"1499158974426\", buttons: [{text: \"text\", payload: \"payload\", style: PRIMARY}] }}}" +
             "]}) {successful}}"
@@ -137,14 +137,14 @@ router.post('/',  jsonParser, function(req, res, next) {
            // var title = "It's me, Mearsey !";
            // var text = "I am here to help you to answers your questions and provide you with the information you need to do work at Mears.";
 
-        //var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {title: \"" + title + "\" , text: \"" + text + "\"}}  ]  }) {successful}} "
+        var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {title: \"" + title + "\" , text: \"" + text + "\"}}  ]  }) {successful}} "
 
         console.log(createTargetedMessage);
         request.post(
             'https://api.watsonwork.ibm.com/graphql',
             {
                 headers: {
-                    'Authorization': 'Bearer ' + storage.getItemSync('token'),
+                    'Authorization': 'Bearer ' + storage.getItem('token'),
                     'Content-Type': 'application/graphql',
                     'x-graphql-view': 'PUBLIC, BETA'
                 },
@@ -195,8 +195,8 @@ router.post('/',  jsonParser, function(req, res, next) {
                             "version": "1",
 
                             "color": "#36a64f",
-                            "title": "Andrew",
-                            "text": "Andrew",
+                            "title": "",
+                            "text": text[0],
 
                         }
                     ]
@@ -205,7 +205,6 @@ router.post('/',  jsonParser, function(req, res, next) {
             },
             function (error, response, body) {
                 console.log(response.statusCode);
-                console.log(response);
                 if (!error && response.statusCode == 200) {
                     console.log(response.body);
                     console.log("HERE");
