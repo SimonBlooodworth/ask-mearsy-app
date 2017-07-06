@@ -14,9 +14,16 @@ var storage = require('node-persist');
 
 var bparser = require('body-parser');
 
-const APP_ID = "639b18ea-dcaa-4da5-bc8a-f1cf2c26acd2";
+// MEARSEY
+/*const APP_ID = "639b18ea-dcaa-4da5-bc8a-f1cf2c26acd2";
 const APP_SECRET = "foq4haxi8ivi01fgmd91rbbcpmhqthoy";
-const WEBHOOK_SECRET = "3qfyjv8y6rx2jsvq25v9uk0ur8n9n004";
+const WEBHOOK_SECRET = "3qfyjv8y6rx2jsvq25v9uk0ur8n9n004";*/
+
+// MEARSEY_LOCAL
+const APP_ID = "d42821da-2fd2-4c16-819d-697d3cdca584";
+const APP_SECRET = "25ao5tls9xmfkqyy5u1wd69fanla46u";
+const WEBHOOK_SECRET = "nskzo08ekj5naz1hjau30qyolipgcw3t";
+
 
 var jsonParser = bparser.json();
 
@@ -50,7 +57,7 @@ router.post('/',  jsonParser, function(req, res, next) {
                 if (!error && response.statusCode == 200) {
                     console.log(response.body);
                     console.log(response.body.access_token);
-                    storage.setItemSync('token', response.body.access_token);
+                    storage.setItem('token', response.body.access_token);
 
                     var formData = {
 
@@ -105,7 +112,7 @@ router.post('/',  jsonParser, function(req, res, next) {
                 if (!error && response.statusCode == 200) {
                     console.log(body);
                     console.log(body.access_token);
-                    storage.setItemSync('token', response.body.access_token);
+                    storage.setItem('token', response.body.access_token);
                 }
 
 
@@ -117,7 +124,7 @@ router.post('/',  jsonParser, function(req, res, next) {
     if (req.body.annotationType == 'actionSelected') {
 
         console.log(JSON.parse(req.body.annotationPayload).targetDialogId );
-        //var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {text: \"text\"}}], " +
+        var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {text: \"text\"}}], " +
             "attachments: [{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"informationcardtitle\", text: \"text\", subtitle: \"subtitle\", date: \"1499158974426\", buttons: [{text: \"text\", payload: \"payload\", style: PRIMARY}] }}}" +
             ",{type: CARD, cardInput: {type: INFORMATION, informationCardInput: {title: \"informationcardtitle\", text: \"text\", subtitle: \"subtitle\", date: \"1499158974426\", buttons: [{text: \"text\", payload: \"payload\", style: PRIMARY}] }}}" +
             "]}) {successful}}"
@@ -130,7 +137,7 @@ router.post('/',  jsonParser, function(req, res, next) {
            // var title = "It's me, Mearsey !";
            // var text = "I am here to help you to answers your questions and provide you with the information you need to do work at Mears.";
 
-        var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {title: \"" + title + "\" , text: \"" + text + "\"}}  ]  }) {successful}} "
+        //var createTargetedMessage = "mutation {createTargetedMessage(input: {conversationId: \"" + req.body.spaceId + "\", targetDialogId: \"" + JSON.parse(req.body.annotationPayload).targetDialogId + "\", targetUserId: \"" + req.body.userId + "\", annotations: [{genericAnnotation: {title: \"" + title + "\" , text: \"" + text + "\"}}  ]  }) {successful}} "
 
         console.log(createTargetedMessage);
         request.post(
@@ -173,7 +180,7 @@ router.post('/',  jsonParser, function(req, res, next) {
             'https://api.watsonwork.ibm.com/v1/spaces/'+spaceId+'/messages',
             {
                 headers: {
-                    'Authorization': 'Bearer ' + storage.getItemSync('token'),
+                    'Authorization': 'Bearer ' + storage.getItem('token'),
                     'spaceid':spaceId
 
                 },
@@ -188,8 +195,8 @@ router.post('/',  jsonParser, function(req, res, next) {
                             "version": "1",
 
                             "color": "#36a64f",
-                            "title": "",
-                            "text": text[0],
+                            "title": "Andrew",
+                            "text": "Andrew",
 
                         }
                     ]
@@ -198,11 +205,14 @@ router.post('/',  jsonParser, function(req, res, next) {
             },
             function (error, response, body) {
                 console.log(response.statusCode);
+                console.log(response);
                 if (!error && response.statusCode == 200) {
                     console.log(response.body);
+                    console.log("HERE");
 
                 } else {
                     console.log(error);
+                    console.log("Andrew");
                 }
             }
         );
